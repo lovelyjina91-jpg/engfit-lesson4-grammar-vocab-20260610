@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EngFit 변형문제 - Lesson 4 종합 (문법+단어+표현)</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .card {
+    background: #fff; border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,.3);
+    width: 100%; max-width: 640px;
+    padding: 36px 32px;
+  }
+  h1 { font-size: 1.5rem; color: #4a3b8c; margin-bottom: 8px; }
+  .subtitle { color:#888; font-size:.95rem; margin-bottom:24px; }
+  .progress-wrap { background:#eee; border-radius:99px; height:10px; margin-bottom:24px; overflow:hidden; }
+  .progress-bar { background:linear-gradient(90deg,#667eea,#764ba2); height:100%; width:0%; transition:width .3s; }
+  .qnum { color:#764ba2; font-weight:700; font-size:.9rem; margin-bottom:8px; }
+  .category { display:inline-block; background:#f0ebff; color:#6a4fc7; font-size:.78rem; padding:3px 10px; border-radius:99px; margin-bottom:12px; }
+  .question { font-size:1.12rem; line-height:1.6; margin-bottom:20px; white-space:pre-line; }
+  .choices { list-style:none; }
+  .choices li {
+    border:2px solid #e3e3ee; border-radius:12px;
+    padding:13px 16px; margin-bottom:10px; cursor:pointer;
+    transition:.15s; font-size:1rem; line-height:1.4;
+  }
+  .choices li:hover { border-color:#a99bf0; background:#faf8ff; }
+  .choices li.selected { border-color:#764ba2; background:#f0ebff; font-weight:600; }
+  .keyhint { color:#bbb; font-size:.8rem; margin-right:8px; }
+  input[type=text] {
+    width:100%; padding:14px 16px; font-size:1.05rem;
+    border:2px solid #e3e3ee; border-radius:12px; outline:none;
+  }
+  input[type=text]:focus { border-color:#764ba2; }
+  .btn {
+    margin-top:22px; width:100%; padding:15px;
+    background:linear-gradient(90deg,#667eea,#764ba2);
+    color:#fff; border:none; border-radius:12px;
+    font-size:1.08rem; font-weight:700; cursor:pointer;
+    transition:.15s;
+  }
+  .btn:hover { opacity:.9; transform:translateY(-1px); }
+  .btn:disabled { background:#ccc; cursor:not-allowed; transform:none; }
+  .hint-enter { text-align:center; color:#aaa; font-size:.82rem; margin-top:10px; }
+  .hidden { display:none; }
+  /* result */
+  .score-big { font-size:3rem; font-weight:800; color:#4a3b8c; text-align:center; margin:10px 0; }
+  .score-msg { text-align:center; color:#666; margin-bottom:24px; font-size:1.05rem; }
+  .review-item { border-left:4px solid #e74c3c; background:#fdf3f2; border-radius:0 12px 12px 0; padding:14px 16px; margin-bottom:14px; }
+  .review-item.correct { border-left-color:#2ecc71; background:#f1fbf5; }
+  .review-q { font-weight:700; margin-bottom:6px; font-size:.95rem; line-height:1.5; }
+  .review-line { font-size:.9rem; margin-bottom:4px; line-height:1.5; }
+  .review-line .label { font-weight:700; }
+  .wrong-ans { color:#c0392b; }
+  .right-ans { color:#1e8e4f; font-weight:700; }
+  .explain { font-size:.88rem; color:#555; background:#fff; border-radius:8px; padding:10px 12px; margin-top:8px; line-height:1.6; }
+  .final-ment { text-align:center; font-size:1.15rem; font-weight:700; color:#764ba2; margin:26px 0 6px; }
+  .copybtn { background:linear-gradient(90deg,#FEE500,#f7d600); color:#3c1e1e; }
+  .toast {
+    position:fixed; bottom:30px; left:50%; transform:translateX(-50%);
+    background:#333; color:#fff; padding:12px 24px; border-radius:99px;
+    font-size:.92rem; opacity:0; transition:.3s; pointer-events:none;
+  }
+  .toast.show { opacity:1; }
+  .start-label { font-weight:600; margin-bottom:8px; display:block; color:#444; }
+  .info-box { background:#f7f5ff; border-radius:12px; padding:16px; font-size:.9rem; color:#555; line-height:1.7; margin:18px 0; }
+</style>
+</head>
+<body>
+<div class="card">
+
+  <!-- 시작 화면 -->
+  <div id="startScreen">
+    <h1>📘 Lesson 4 종합 변형문제</h1>
+    <div class="subtitle">최상급 · want+목적어+to부정사 · 현재완료 · to부정사 · 구동사 · 단어 · 표현</div>
+    <div class="info-box">
+      ✏️ 총 <b>30문제</b> (객관식 + 주관식)<br>
+      ⌨️ 객관식: 숫자키 <b>1~4</b>로 선택, <b>Enter</b>로 다음<br>
+      ⌨️ 주관식: 입력 후 <b>Enter</b><br>
+      🔒 정답과 해설은 <b>모든 문제를 푼 뒤</b> 공개됩니다!
+    </div>
+    <label class="start-label">이름을 입력하세요</label>
+    <input type="text" id="studentName" placeholder="예) 한승주" autocomplete="off">
+    <button class="btn" id="startBtn" onclick="startQuiz()">시작하기 🚀</button>
+    <div class="hint-enter">Enter 키로도 시작할 수 있어요</div>
+  </div>
+
+  <!-- 퀴즈 화면 -->
+  <div id="quizScreen" class="hidden">
+    <div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+    <div class="qnum" id="qNum"></div>
+    <div class="category" id="qCat"></div>
+    <div class="question" id="qText"></div>
+    <ul class="choices hidden" id="choiceList"></ul>
+    <input type="text" id="shortInput" class="hidden" placeholder="정답을 입력하세요" autocomplete="off">
+    <button class="btn" id="nextBtn" onclick="submitAnswer()">다음 ▶</button>
+    <div class="hint-enter">Enter = 다음 문제</div>
+  </div>
+
+  <!-- 결과 화면 -->
+  <div id="resultScreen" class="hidden">
+    <h1>🎉 결과 발표</h1>
+    <div class="score-big" id="scoreBig"></div>
+    <div class="score-msg" id="scoreMsg"></div>
+    <button class="btn copybtn" onclick="copyResult()">📋 지나티처에게 보낼 결과 복사하기</button>
+    <div class="hint-enter">복사한 뒤 카카오톡에 붙여넣기 하면 끝!</div>
+    <h2 style="font-size:1.1rem;color:#4a3b8c;margin:28px 0 14px;">📝 문제별 해설</h2>
+    <div id="reviewList"></div>
+    <div class="final-ment">수고했습니당 ~~~ ㅎㅎㅎ</div>
+  </div>
+
+</div>
+<div class="toast" id="toast">복사 완료! 카카오톡에 붙여넣어 주세요 💛</div>
+
+<script>
+const QUESTIONS = [
+// ===== 최상급 =====
+{cat:"최상급", type:"mc",
+ q:"다음 중 최상급 형태가 잘못된 것은?",
+ c:["small → smallest","large → largest","happy → happyest","big → biggest"],
+ a:2,
+ exp:"「자음+y」로 끝나는 단어는 y를 i로 바꾸고 -est를 붙여요. happy → happiest가 맞아요. (funny → funniest도 같은 규칙!)"},
+{cat:"최상급", type:"mc",
+ q:"bad의 최상급으로 알맞은 것은?",
+ c:["baddest","badest","worst","most bad"],
+ a:2,
+ exp:"bad/ill은 불규칙 변화로 최상급이 worst예요. good/well → best, many/much → most, little → least도 함께 외워두세요!"},
+{cat:"최상급", type:"mc",
+ q:"빈칸에 알맞은 것은?\nHe works hardest ___ all the employees.",
+ c:["in","of","at","for"],
+ a:1,
+ exp:"비교 범위는 「in+장소/단체(지역·집단)」 또는 「of+복수 명사/숫자/기간(개별 대상)」으로 나타내요. all the employees는 복수 명사이므로 of! (He runs fastest in his class와 비교해 보세요.)"},
+{cat:"최상급", type:"short",
+ q:"우리말과 일치하도록 빈칸을 채우세요. (happy 이용, 두 단어)\n오늘은 내 인생에서 가장 행복한 날이다.\n→ Today is (        ) day of my life.",
+ a:["the happiest"],
+ exp:"최상급은 「the+최상급」 형태로 써요. happy는 자음+y로 끝나므로 happiest. 정답: the happiest"},
+{cat:"최상급", type:"mc",
+ q:"thin의 최상급으로 알맞은 것은?",
+ c:["thinest","thinnest","most thin","thiniest"],
+ a:1,
+ exp:"「단모음+단자음」으로 끝나면 마지막 자음을 한 번 더 쓰고 -est를 붙여요. thin → thinnest (big → biggest, hot → hottest와 같은 규칙!)"},
+// ===== want+목적어+to부정사 =====
+{cat:"want+목적어+to부정사", type:"mc",
+ q:"빈칸에 알맞은 것은?\nMy parents want me ___ more.",
+ c:["study","studying","to study","studied"],
+ a:2,
+ exp:"want는 「want+목적어+to부정사」 형태로 '~가 …하기를 원하다'를 나타내요. 목적격 보어 자리에는 to부정사!"},
+{cat:"want+목적어+to부정사", type:"mc",
+ q:"다음 중 「동사+목적어+to부정사」 형태로 쓸 수 <u>없는</u> 동사는?",
+ c:["want","tell","make","expect"],
+ a:2,
+ exp:"make는 사역동사라 목적격 보어로 동사원형을 써요(make me study). want, ask, tell, expect, allow + advise, cause, command, enable, encourage, invite, order, permit, persuade는 모두 to부정사를 목적격 보어로 취해요!"},
+{cat:"want+목적어+to부정사", type:"mc",
+ q:"빈칸에 알맞은 것은?\nThey asked me ___ them to the bus station.",
+ c:["drive","to drive","driving","drove"],
+ a:1,
+ exp:"ask는 「ask+목적어+to부정사」로 '~에게 …해 달라고 부탁하다'를 나타내요. 정답: to drive"},
+{cat:"want+목적어+to부정사", type:"short",
+ q:"주어진 말을 바르게 배열하세요.\nMr. Taylor (        ) quiet. (the students / be / told / to)",
+ a:["told the students to be"],
+ exp:"「tell+목적어+to부정사」 어순! Mr. Taylor told the students to be quiet. (Mr. Taylor는 학생들에게 조용히 하라고 말했다)"},
+{cat:"want+목적어+to부정사", type:"short",
+ q:"우리말과 일치하도록 영작하세요. (want, his friends, join 이용)\n그는 그의 친구들이 게임에 참가하기를 원한다.\n→ He (        ) the game.",
+ a:["wants his friends to join","want his friends to join"],
+ exp:"「want+목적어+to부정사」 어순으로, 주어가 He(3인칭 단수)이므로 wants his friends to join이 정확한 답이에요. 목적어(his friends)가 to부정사 앞에 와야 해요!"},
+// ===== to부정사 목적어 =====
+{cat:"to부정사 목적어", type:"mc",
+ q:"다음 중 to부정사를 목적어로 취하지 <u>않는</u> 동사는?",
+ c:["decide","hope","finish","promise"],
+ a:2,
+ exp:"to부정사를 목적어로 취하는 동사: decide, expect, hope, plan, promise, want, wish, agree, learn, need, choose, manage, refuse, afford, pretend. finish는 동명사(-ing)를 목적어로 취해요!"},
+{cat:"to부정사 목적어", type:"mc",
+ q:"빈칸에 알맞은 것은?\nI can't afford ___ a new car.",
+ c:["buy","buying","to buy","bought"],
+ a:2,
+ exp:"afford는 to부정사를 목적어로 취하는 동사예요. can't afford to buy = 살 여유가 없다"},
+{cat:"to부정사 목적어", type:"mc",
+ q:"빈칸에 알맞은 것은?\nShe pretended ___ asleep.",
+ c:["be","being","to be","been"],
+ a:2,
+ exp:"pretend(~인 척하다)도 to부정사를 목적어로 취해요. pretended to be asleep = 잠든 척했다"},
+// ===== 현재완료 =====
+{cat:"현재완료", type:"mc",
+ q:"다음 문장의 현재완료 용법은?\nHave you ever been to Singapore?",
+ c:["경험","결과","완료","계속"],
+ a:0,
+ exp:"have been to + ever = '~에 가 본 적 있니?'라는 경험 용법이에요. ever, never, once, before, ~times가 경험의 단서!"},
+{cat:"현재완료", type:"mc",
+ q:"He has gone to America. 의 의미로 알맞은 것은?",
+ c:["미국에 가 본 적이 있다","미국에 갔다 와서 지금 여기 있다","미국에 가서 지금 여기에 없다","미국에 가고 있는 중이다"],
+ a:2,
+ exp:"has gone to는 결과 용법으로 '~에 가버렸다(그래서 지금 여기 없다)'는 뜻이에요. has been to(가 본 적 있다, 경험)와 꼭 구별하세요!"},
+{cat:"현재완료", type:"mc",
+ q:"다음 중 어법상 <u>어색한</u> 문장은?",
+ c:["I have gone to London.","He has gone to America.","I have been to Hong Kong three times.","She has gone to Paris."],
+ a:0,
+ exp:"have gone to(가버리고 없다)는 말하는 사람 자신(I, you, we)에게는 쓸 수 없어요! 내가 가버리고 없다면 지금 말을 할 수 없겠죠? 3인칭 주어와만 함께 씁니다."},
+{cat:"현재완료", type:"mc",
+ q:"다음 문장의 현재완료 용법은?\nHow long have you worked here?",
+ c:["경험","결과","완료","계속"],
+ a:3,
+ exp:"How long(얼마나 오래)과 함께 쓰여 과거부터 지금까지 계속되는 일을 물어보는 계속 용법이에요. since, for도 계속 용법의 단서!"},
+{cat:"현재완료", type:"mc",
+ q:"빈칸에 알맞은 것은?\nHe came back just ___.",
+ c:["now","already","yet","since"],
+ a:0,
+ exp:"just now(방금 전에)는 과거시제와 함께 써요. came back(과거)이므로 just now! 현재완료에서는 just(막 ~했다)만 단독으로 씁니다."},
+{cat:"현재완료", type:"mc",
+ q:"현재완료의 '경험'을 나타내는 문장에서 자주 쓰이는 표현이 <u>아닌</u> 것은?",
+ c:["ever","never","once","just"],
+ a:3,
+ exp:"경험 용법의 단서: ever, never, once, before, ~times(횟수). just(막 ~했다)는 완료 용법의 단서예요! (I have just been to the store.)"},
+// ===== 단어 =====
+{cat:"단어", type:"mc",
+ q:"striped(줄무늬가 있는)와 반대되는 뜻의 단어는?",
+ c:["plain","stripe","strip","furry"],
+ a:0,
+ exp:"striped(줄무늬 있는) ≠ plain(무늬 없는). stripe는 명사 '줄무늬', strip은 동사 '벗기다, 제거하다 / 명사: 가늘고 긴 조각'이에요. 철자가 비슷하니 주의!"},
+{cat:"단어", type:"mc",
+ q:"strip의 뜻으로 알맞은 것은?",
+ c:["줄무늬","(동) 벗기다, 제거하다 (명) 가늘고 긴 조각","기대하다","무늬가 없는"],
+ a:1,
+ exp:"strip = 벗기다, 제거하다 / 가늘고 긴 조각. stripe(줄무늬)와 striped(줄무늬 있는)과 헷갈리지 마세요!"},
+{cat:"단어", type:"mc",
+ q:"형용사-명사 연결이 <u>잘못된</u> 것은?",
+ c:["long - length","strong - strength","wide - width","high - high"],
+ a:3,
+ exp:"high의 명사형은 height(높이)예요! long-length(길이), strong-strength(힘), wide-width(너비)와 함께 묶어서 암기하세요."},
+{cat:"단어", type:"short",
+ q:"'무중력의'를 뜻하는 영어 단어는? (weigh에서 파생, 한 단어)",
+ a:["weightless"],
+ exp:"weigh(무게를 재다) → weight(무게) → weightless(무중력의). overweight는 '과체중'! -less는 '~이 없는'이라는 뜻의 접미사예요."},
+{cat:"단어", type:"mc",
+ q:"thanks to(~덕분에)와 바꿔 쓸 수 <u>없는</u> 것은?",
+ c:["owing to","due to","on account of","instead of"],
+ a:3,
+ exp:"thanks to = owing to = due to = on account of (~덕분에, ~때문에). instead of는 '~대신에'라는 뜻이라 의미가 달라요!"},
+{cat:"단어", type:"mc",
+ q:"unite와 의미가 가장 <u>거리가 먼</u> 것은?",
+ c:["join","combine","come together","separate"],
+ a:3,
+ exp:"unite = join = combine = come together (합치다, 모이다). separate는 '분리하다'로 반대말이에요!"},
+{cat:"단어", type:"mc",
+ q:"빈칸의 단어와 바꿔 쓸 수 있는 것은?\nThe movie was quite good. (그 영화는 꽤 좋았다)",
+ c:["pretty","never","plain","exact"],
+ a:0,
+ exp:"quite = pretty (꽤, 매우, 정말로). pretty가 부사로 쓰이면 '예쁜'이 아니라 '꽤'라는 뜻이에요!"},
+{cat:"단어", type:"mc",
+ q:"stand out(눈에 띄다)과 바꿔 쓸 수 있는 표현은?",
+ c:["be noticeable","be careful","be quiet","be similar"],
+ a:0,
+ exp:"stand out = be noticeable = be outstanding (눈에 띄다, 두드러지다). desire(욕구, 간절히 원하다)와 함께 노트에 정리했던 단어죠!"},
+// ===== 구동사 =====
+{cat:"구동사", type:"mc",
+ q:"다음 중 어법상 <u>틀린</u> 것은?",
+ c:["turn the light on","turn on the light","turn it off","turn off it"],
+ a:3,
+ exp:"구동사의 목적어가 대명사(it, them 등)일 때는 반드시 「동사+대명사+부사」 순서! turn it off (O) / turn off it (X), pick it up (O) / pick up it (X)"},
+{cat:"구동사", type:"short",
+ q:"같은 뜻이 되도록 빈칸을 채우세요. (두 단어)\nDon't forget to bring your umbrella.\n= Be sure (        ) your umbrella.",
+ a:["to bring"],
+ exp:"Be sure to+동사원형 = Don't forget to+동사원형 = Remember to+동사원형 (반드시 ~해라). 정답: to bring"},
+// ===== 표현 =====
+{cat:"약속/거절 표현", type:"mc",
+ q:"약속을 거절하는 표현으로 적절하지 <u>않은</u> 것은?",
+ c:["I'm afraid I can't.","I'd love to, but I have other plans.","That sounds nice, but I'd rather not.","What time works for you?"],
+ a:3,
+ exp:"What time works for you?(몇 시가 괜찮아?)는 약속을 정할 때 쓰는 표현이에요. 거절 표현: Sorry, but I can't make it / I'm afraid I can't / I'd love to, but… / I'd rather not / I don't feel like it / I'm not in the mood"}
+];
+
+let cur = 0;
+let answers = [];   // 사용자가 고른 답 (mc: index, short: 문자열)
+let studentName = "";
+let selected = -1;
+
+function $(id){ return document.getElementById(id); }
+
+function startQuiz(){
+  studentName = $("studentName").value.trim() || "이름없음";
+  $("startScreen").classList.add("hidden");
+  $("quizScreen").classList.remove("hidden");
+  renderQ();
+}
+
+function renderQ(){
+  const q = QUESTIONS[cur];
+  selected = -1;
+  $("progressBar").style.width = (cur/QUESTIONS.length*100)+"%";
+  $("qNum").textContent = `문제 ${cur+1} / ${QUESTIONS.length}`;
+  $("qCat").textContent = q.cat;
+  $("qText").innerHTML = q.q.replace(/\n/g,"<br>");
+  const list = $("choiceList");
+  const input = $("shortInput");
+  if(q.type === "mc"){
+    list.classList.remove("hidden");
+    input.classList.add("hidden");
+    list.innerHTML = "";
+    q.c.forEach((c,i)=>{
+      const li = document.createElement("li");
+      li.innerHTML = `<span class="keyhint">${i+1}</span>${c}`;
+      li.onclick = ()=>selectChoice(i);
+      list.appendChild(li);
+    });
+  } else {
+    list.classList.add("hidden");
+    input.classList.remove("hidden");
+    input.value = "";
+    setTimeout(()=>input.focus(),50);
+  }
+  $("nextBtn").textContent = cur === QUESTIONS.length-1 ? "제출하기 ✅" : "다음 ▶";
+}
+
+function selectChoice(i){
+  selected = i;
+  const lis = $("choiceList").children;
+  for(let j=0;j<lis.length;j++) lis[j].classList.toggle("selected", j===i);
+}
+
+function normalize(s){
+  return s.toLowerCase().replace(/[.,!?']/g,"").replace(/\s+/g," ").trim();
+}
+
+function submitAnswer(){
+  const q = QUESTIONS[cur];
+  if(q.type === "mc"){
+    if(selected === -1){ shake(); return; }
+    answers.push(selected);
+  } else {
+    const v = $("shortInput").value.trim();
+    if(!v){ shake(); return; }
+    answers.push(v);
+  }
+  cur++;
+  if(cur < QUESTIONS.length) renderQ();
+  else showResult();
+}
+
+function shake(){
+  const card = document.querySelector(".card");
+  card.style.transition="transform .08s";
+  card.style.transform="translateX(-6px)";
+  setTimeout(()=>{card.style.transform="translateX(6px)";},80);
+  setTimeout(()=>{card.style.transform="";},160);
+}
+
+function isCorrect(q, ans){
+  if(q.type === "mc") return ans === q.a;
+  return q.a.some(acc => normalize(acc) === normalize(ans));
+}
+
+function showResult(){
+  $("quizScreen").classList.add("hidden");
+  $("resultScreen").classList.remove("hidden");
+  let correct = 0;
+  const review = $("reviewList");
+  review.innerHTML = "";
+  QUESTIONS.forEach((q,i)=>{
+    const ok = isCorrect(q, answers[i]);
+    if(ok) correct++;
+    const div = document.createElement("div");
+    div.className = "review-item" + (ok ? " correct" : "");
+    const myAns = q.type==="mc" ? `${answers[i]+1}번. ${q.c[answers[i]]}` : answers[i];
+    const rightAns = q.type==="mc" ? `${q.a+1}번. ${q.c[q.a]}` : q.a[0];
+    div.innerHTML = `
+      <div class="review-q">${ok?"⭕":"❌"} [${i+1}] ${q.q.replace(/\n/g,"<br>")}</div>
+      <div class="review-line"><span class="label">내 답:</span> <span class="${ok?'right-ans':'wrong-ans'}">${escapeHtml(myAns)}</span></div>
+      ${ok ? "" : `<div class="review-line"><span class="label">정답:</span> <span class="right-ans">${escapeHtml(rightAns)}</span></div>`}
+      ${ok ? "" : `<div class="explain">💡 ${q.exp}</div>`}
+    `;
+    review.appendChild(div);
+  });
+  const score100 = Math.round(correct/QUESTIONS.length*100);
+  $("scoreBig").textContent = `${correct} / ${QUESTIONS.length}`;
+  let msg = "";
+  if(score100===100) msg = `${score100}점! 완벽해요!! 🏆`;
+  else if(score100>=80) msg = `${score100}점! 아주 잘했어요! 👏`;
+  else if(score100>=60) msg = `${score100}점! 조금만 더 힘내요! 💪`;
+  else msg = `${score100}점! 해설 읽고 한 번 더 도전! 🔥`;
+  $("scoreMsg").textContent = msg;
+  window._result = {correct, score100};
+}
+
+function escapeHtml(s){
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+function copyResult(){
+  const {correct, score100} = window._result;
+  const wrongs = [];
+  QUESTIONS.forEach((q,i)=>{ if(!isCorrect(q,answers[i])) wrongs.push(i+1); });
+  const lines = [
+    "📘 [EngFit 변형문제 결과]",
+    "Lesson 4 종합 (문법+단어+표현)",
+    `이름: ${studentName}`,
+    `점수: ${correct}/${QUESTIONS.length} (${score100}점)`,
+    wrongs.length ? `틀린 문제: ${wrongs.join(", ")}번` : "틀린 문제: 없음 (만점!) 🎉",
+    `제출 시각: ${new Date().toLocaleString("ko-KR")}`
+  ];
+  const text = lines.join("\n");
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(showToast).catch(()=>fallbackCopy(text));
+  } else fallbackCopy(text);
+}
+
+function fallbackCopy(text){
+  const ta = document.createElement("textarea");
+  ta.value = text; document.body.appendChild(ta);
+  ta.select(); document.execCommand("copy");
+  document.body.removeChild(ta);
+  showToast();
+}
+
+function showToast(){
+  const t = $("toast");
+  t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 2200);
+}
+
+document.addEventListener("keydown", e=>{
+  if(!$("startScreen").classList.contains("hidden")){
+    if(e.key === "Enter") startQuiz();
+    return;
+  }
+  if(!$("quizScreen").classList.contains("hidden")){
+    const q = QUESTIONS[cur];
+    if(e.key === "Enter"){ e.preventDefault(); submitAnswer(); return; }
+    if(q.type === "mc" && ["1","2","3","4"].includes(e.key)){
+      const i = parseInt(e.key)-1;
+      if(i < q.c.length) selectChoice(i);
+    }
+  }
+});
+</script>
+</body>
+</html>
